@@ -9,8 +9,8 @@ def start():
     run crunches
     '''
     tweets = parse('./data/tweet.js')
-    crunch_timeseries_counts(tweets)
-
+    #crunch_timeseries_counts(tweets)
+    crunch_timeseries_sentiment(tweets)
 
 def parse(path):
     '''
@@ -39,13 +39,18 @@ def axFormatDate(ax):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     ax.tick_params(axis='x', rotation=90)
 
+def dayOfTweet(tweet,prop='created_at'):
+    '''
+    returns the date object of the tweet without time info
+    '''
+    return datetime.strptime(tweett[prop],'%a %b %d %H:%M:%S +0000 %Y').date()
+
 def crunch_timeseries_counts(tweets):
     '''
     shows daily counts over time
     '''
     
-    dates = [datetime.strptime(t['created_at'],'%a %b %d %H:%M:%S +0000 %Y') for t in tweets]
-    dates = [d.date() for d in dates]
+    dates = [dayOfTweet(t) for t in tweets]
     unique, counts = numpy.unique(dates, return_counts=True)
     plot_timeseries_bar(unique,counts,'Tweets Per Day')
 
@@ -54,6 +59,18 @@ def crunch_timeseries_counts(tweets):
     bins = sorted(bins, key=lambda x: x[1],reverse=True)[0:10]
     print('Your Most Active Days',bins)
 
+def crunch_timeseries_sentiment(tweets):
+    '''
+    shows daily sentiment over time
+    '''
+    mytweets = [t for t in tweets if t['retweeted'] == False]
+    mytweetsbyday = {}
+    for t in mytweets:
+        date = dayOfTweet(t)
+        mytweetsbyday[date] = mytweetsbyday[date] if date in mytweetsbyday else []
+        mytweetsbyday[date] = mytweetsbyday[date].append(t['full_text'])
+
+    print(mytweetsbyday.entities()[0:10])
 
 if __name__ == "__main__":
     start()
