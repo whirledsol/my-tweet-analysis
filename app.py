@@ -108,7 +108,7 @@ def crunch_timeseries_sentiment(tweets,username):
     ys = [i[2] for i in mysentiments]
     title = f"@{username}'s Tweet Sentiments"
     cmap = plt.get_cmap("RdYlGn")
-    #plot_timeseries(xs, ys, title=title, kind="bar", yLabel='Positivity', cmap=cmap)
+    plot_timeseries(xs, ys, title=title, kind="bar", yLabel='Positivity', cmap=cmap)
 
     #monthly trend chart
     trend = {} #month:numpy.mean(polarity)
