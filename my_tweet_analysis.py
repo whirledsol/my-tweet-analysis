@@ -4,9 +4,9 @@ driver
 @author: whirledsol
 """
 
-import json
+import json,argparse
 from my_tweet_analysis_base import *
-import my_tweet_analysis_crunches
+from my_tweet_analysis_crunches import my_tweet_analysis_crunches
 
 def start():
     '''
@@ -14,13 +14,15 @@ def start():
     '''
     args = parse()
     tweets = load(args.file)
-    #crunch_timeseries_counts(tweets,username)
-    crunch_timeseries_sentiment(tweets,username)
+
+    crunchname = f"crunch_{args.crunch}"
     crunch = None
+    
     try:
-        crunch = getattr(my_tweet_analysis_crunches, f"crunch_{args.crunch}")()
+        crunch = getattr(my_tweet_analysis_crunches, crunchname)
     except:
-        print('Could not find the appropriate crunch to call',args.crunch)
+        print('Could not find the appropriate crunch to call',crunchname)
+        exit()
 
     crunch(tweets,args.username)
     
@@ -35,14 +37,14 @@ def parse():
     crunches = ['timeseries_counts','timeseries_sentiment','timeseries_sentiment_trend']
 
     parser = argparse.ArgumentParser(description='Run analytics on twitter archive data.')
-    parser.add_argument('-f','--file',dest='file',type=str, default=default_file, help='path to tweet.js file')
+    parser.add_argument('-f','--file',dest='file',type=str, default=default_file, help=f"path to tweet.js file, by default looks for {default_file}")
     parser.add_argument('-u','--username',dest='username',type=str, help='your username, for display only', required=True)
     parser.add_argument('-c','--crunch',dest='crunch',type=str, help='the type of analysis to perform', required=True, choices=crunches)
 
     args = parser.parse_args()
 
     #cleanup
-    args.username = args.username.strip(['@',' '])
+    args.username = args.username.strip('@')
     return args
 
 

@@ -12,3 +12,24 @@ pip install -r requirements.txt
 ```
 
 # Usage
+This application uses the paradigm of *crunches* which allow the user to selectively perform various "number crunching" algorithms on the dataset. The crunch name is a supplied argument under ```-c```. See below for examples.
+
+### Graph of Counts Per Day
+```bash
+python my_tweet_analysis.py -f ./path/to/tweet.js -u whirledsol -c timeseries_counts
+```
+
+### Graph of Sentiment/Polarity in Tweets 
+```bash
+python my_tweet_analysis.py -f ./path/to/tweet.js -u whirledsol -c crunch_timeseries_sentiment
+```
+
+### Graph of Sentiment/Polarity in Tweets, averaged by Month
+```bash
+python my_tweet_analysis.py -f ./path/to/tweet.js -u whirledsol -c crunch_timeseries_sentiment_trend
+```
+
+### For more information...
+```bash
+python my_tweet_analysis.py -h
+```

@@ -8,7 +8,7 @@ import numpy,re
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from datetime import datetime
-from sentifish import Sentiment
+from sentifish import Sentiment,sentTokenizer
 
 def plot_timeseries(xs,ys,kind="plot",title='Data',yLabel='Number',cmap=None):
     _, ax = plt.subplots()
@@ -23,7 +23,6 @@ def plot_timeseries(xs,ys,kind="plot",title='Data',yLabel='Number',cmap=None):
         ax.plot(xs, ys, '-o', color=color)
 
     ax.set_title(title)
-    ax.legend()
     ax.set_xlabel('Date')
     axFormatDate(ax)
     ax.set_ylabel(yLabel)
@@ -67,13 +66,22 @@ def calc_sentiments(tweets):
     mysentiments = [t for t in tweets if tweet_ismine(t)]
     mysentiments = [[tweet_getDate(t),tweet_getText(t,True),0] for t in mysentiments]
 
+    f = 0 #failure count
     for i in range(len(mysentiments)):
         date,t,_ = mysentiments[i]
         try:
-            polarity = Sentiment(t).analyze()
+            sentences = sentTokenizer(t) if '. ' in t else [t]
+            polarity = [Sentiment(sentence).analyze() for sentence in sentences]
+            polarity = numpy.mean(polarity)
             mysentiments[i] = [date,t,polarity]
         except:
-            print('could not analyize',t)
+            print('[INFO] FAILED TO GET SENTIMENT OF:',t)
+            f+=1
+
+    if f > 0.1*len(mysentiments):
+        print("[WARNING] A large portion of the dataset could not be analyzed. Please open a bug in github if this is an issue.")
+
+    return mysentiments
 
 if __name__ == "__main__":
     start()
